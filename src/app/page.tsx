@@ -2,10 +2,10 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { Shell } from "@/app/components/Sidebar";
-import { MetricsCards } from "./components/MetricsCards";
-import { AssetStatusBoard } from "./components/AssetStatusBoard";
-import { Notifications } from "./components/Notifications";
+import { Shell } from "@/components/Sidebar";
+import { MetricsCards } from "../components/MetricsCards";
+import { AssetStatusBoard } from "../components/AssetStatusBoard";
+import { Notifications } from "../components/Notifications";
 
 export default async function Home() {
   const { userId } = await auth();
