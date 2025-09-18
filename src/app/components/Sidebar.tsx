@@ -4,6 +4,7 @@ import type * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { UserButton, useUser } from "@clerk/nextjs";
 import {
   Home,
   Boxes,
@@ -17,9 +18,14 @@ import {
   Settings,
   Bot,
   Bell,
-  User,
   Menu,
+  X,
 } from "lucide-react";
+
+/** Unified TopNav + Sidebar
+ * - Single brand in TopNav
+ * - Sidebar is a clean rail (no logo header)
+ */
 
 const sideItems = [
   { name: "Dashboard", href: "/", icon: Home },
@@ -32,30 +38,35 @@ const sideItems = [
   { name: "Mobile Companion", href: "/mobile", icon: Smartphone },
 ] as const;
 
-function Sidebar({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+export function Sidebar() {
   const pathname = usePathname() || "/";
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>
-      {/* Mobile overlay */}
-      {isOpen && (
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="md:hidden p-2 text-gray-600 hover:text-gray-900"
+      >
+        {isMobileMenuOpen ? (
+          <X className="h-5 w-5" />
+        ) : (
+          <Menu className="h-5 w-5" />
+        )}
+      </button>
+
+      {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={onClose}
+          className="fixed inset-0 z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
 
       <aside
         className={[
-          "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 border-r border-gray-200 bg-gray-50 overflow-y-auto z-50 transition-transform duration-300",
-          // Mobile: hidden by default, slide in when open
-          isOpen ? "translate-x-0" : "-translate-x-full",
+          "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 border-r border-gray-200 bg-gray-50 overflow-y-auto z-40 transition-transform duration-300",
+          // Mobile: hidden by default, slide in when menu is open
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
           // Desktop: always visible
           "md:translate-x-0",
         ].join(" ")}
@@ -69,7 +80,7 @@ function Sidebar({
                 <Link
                   key={href}
                   href={href}
-                  onClick={onClose}
+                  onClick={() => setIsMobileMenuOpen(false)}
                   className={[
                     "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
                     active
@@ -95,7 +106,7 @@ function Sidebar({
           <div className="mt-auto space-y-2">
             <Link
               href="/settings"
-              onClick={onClose}
+              onClick={() => setIsMobileMenuOpen(false)}
               className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900"
             >
               <Settings className="h-5 w-5 text-gray-400" />
@@ -120,24 +131,20 @@ function Sidebar({
   );
 }
 
-function TopNav({ onMenuClick }: { onMenuClick: () => void }) {
+export function TopNav() {
+  const { isSignedIn, user } = useUser();
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-gray-200 bg-white">
       <div className="flex h-full items-center px-4 md:px-6">
-        {/* Mobile hamburger */}
-        <button
-          onClick={onMenuClick}
-          className="mr-2 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-2 shadow-sm md:hidden"
-          aria-label="Open menu"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-
-        {/* Logo on the left */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded bg-blue-600" />
-          <span className="text-lg font-semibold text-blue-700">logo</span>
-        </Link>
+        {/* Logo and mobile menu button */}
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded bg-blue-600" />
+            <span className="text-lg font-semibold text-blue-700">logo</span>
+          </Link>
+          <Sidebar />
+        </div>
 
         <div className="flex-1" />
 
@@ -148,7 +155,7 @@ function TopNav({ onMenuClick }: { onMenuClick: () => void }) {
             <input
               type="search"
               placeholder="Search assets, work orders..."
-              className="w-40 sm:w-48 md:w-80 rounded-lg border border-gray-200 bg-white pl-10 pr-4 py-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-48 md:w-80 rounded-lg border border-gray-200 bg-white pl-10 pr-4 py-2 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
@@ -156,9 +163,17 @@ function TopNav({ onMenuClick }: { onMenuClick: () => void }) {
             <Bell className="h-5 w-5" />
           </button>
 
-          <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-            <User className="h-4 w-4 text-white" />
-          </div>
+          {isSignedIn && (
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "h-8 w-8",
+                  userButtonPopoverCard: "shadow-lg border border-gray-200",
+                  userButtonPopoverActionButton: "hover:bg-gray-50",
+                },
+              }}
+            />
+          )}
         </div>
       </div>
     </header>
@@ -166,16 +181,11 @@ function TopNav({ onMenuClick }: { onMenuClick: () => void }) {
 }
 
 export function Shell({ children }: { children: React.ReactNode }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <TopNav onMenuClick={() => setIsSidebarOpen((v) => !v)} />
+      <TopNav />
       <div className="flex">
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
+        <Sidebar />
         <main className="flex-1 ml-0 md:ml-64 mt-16 p-4 md:p-6">
           {children}
         </main>
