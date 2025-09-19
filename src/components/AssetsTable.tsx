@@ -3,55 +3,17 @@
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 
-const assets = [
-  {
-    id: "AM-001-A",
-    name: "Injection Molding Machine",
-    type: "Manufacturing",
-    model: "InjectPro 5000",
-    location: "Production Line A",
-    status: "Active",
-    statusColor: "bg-green-100 text-green-800",
-  },
-  {
-    id: "AM-002-B",
-    name: "Forklift Hyster H40",
-    type: "Logistics",
-    model: "Hyster H40X",
-    location: "Warehouse B",
-    status: "Maintenance Due",
-    statusColor: "bg-yellow-100 text-yellow-800",
-  },
-  {
-    id: "AM-003-C",
-    name: "CNC Milling Machine",
-    type: "Manufacturing",
-    model: "Haas VF-2",
-    location: "Workshop A",
-    status: "Active",
-    statusColor: "bg-green-100 text-green-800",
-  },
-  {
-    id: "AM-004-D",
-    name: "Air Compressor Atlas Copco",
-    type: "Utilities",
-    model: "GA 75 VSD+",
-    location: "Utility Room",
-    status: "Critical",
-    statusColor: "bg-red-100 text-red-800",
-  },
-  {
-    id: "AM-005-E",
-    name: "Packaging Line AutoPack",
-    type: "Packaging",
-    model: "PackMaster 3000",
-    location: "Packing Area",
-    status: "Active",
-    statusColor: "bg-green-100 text-green-800",
-  },
-];
+export interface Asset {
+  id: string;
+  name: string;
+  type: "Manufacturing" | "Logistics" | "Utilities" | "Packaging";
+  model: string;
+  location: string;
+  status: "Active" | "Maintenance Due" | "Critical";
+  statusColor: string; // tailwind classes
+}
 
-export function AssetsTable() {
+export function AssetsTable({ assets }: { assets: Asset[] }) {
   return (
     <div className="bg-white rounded-lg border">
       <div className="p-6 border-b">
@@ -126,15 +88,27 @@ export function AssetsTable() {
                 </td>
               </tr>
             ))}
+
+            {assets.length === 0 && (
+              <tr>
+                <td
+                  colSpan={8}
+                  className="px-6 py-10 text-center text-sm text-gray-500"
+                >
+                  No assets match your filters.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
+      {/* Pagination UI (not wired yet) */}
       <div className="px-6 py-4 border-t bg-gray-50 flex items-center justify-between">
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 bg-transparent text-gray-600"
+          className="flex items-center gap-2 bg-transparent text-gray-700"
         >
           <ChevronLeft className="w-4 h-4" />
           Previous
@@ -167,7 +141,7 @@ export function AssetsTable() {
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 bg-transparent text-gray-600"
+          className="flex items-center gap-2 bg-transparent text-gray-700"
         >
           Next
           <ChevronRight className="w-4 h-4" />
