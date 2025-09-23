@@ -8,6 +8,9 @@ export interface Asset {
   name: string;
   type: "Manufacturing" | "Logistics" | "Utilities" | "Packaging";
   model: string;
+  manufacturer: string;
+  acquisitionDate: string;
+  expectedLifespan: number;
   location: string;
   status: "Active" | "Maintenance Due" | "Critical";
   statusColor: string; // tailwind classes
@@ -40,6 +43,9 @@ export function AssetsTable({ assets }: { assets: Asset[] }) {
                 Type
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Manufacturer
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Model
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -69,6 +75,9 @@ export function AssetsTable({ assets }: { assets: Asset[] }) {
                   {asset.type}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {asset.manufacturer}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {asset.model}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -92,7 +101,7 @@ export function AssetsTable({ assets }: { assets: Asset[] }) {
             {assets.length === 0 && (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={9}
                   className="px-6 py-10 text-center text-sm text-gray-500"
                 >
                   No assets match your filters.

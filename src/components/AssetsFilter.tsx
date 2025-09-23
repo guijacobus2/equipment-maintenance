@@ -1,19 +1,12 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Search, MapPin, Activity } from "lucide-react";
 
 export type Filters = {
   q: string;
   type: "All" | "Manufacturing" | "Logistics" | "Utilities" | "Packaging";
-  location:
-    | "All"
-    | "Production Line A"
-    | "Warehouse B"
-    | "Workshop A"
-    | "Utility Room"
-    | "Packing Area";
+  location: string;
   status: "All" | "Active" | "Maintenance Due" | "Critical";
 };
 
@@ -34,7 +27,7 @@ export function AssetFilters({
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4" />
           <Input
             placeholder="Search assets..."
-            className="pl-10 text-gray-700"
+            className="pl-10 text-gray-700 border-gray-300"
             value={value.q}
             onChange={(e) => set("q", e.target.value)}
           />
@@ -55,20 +48,12 @@ export function AssetFilters({
 
           <div className="relative">
             <MapPin className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <select
-              className="pl-10 pr-8 py-2 border border-gray-300 text-gray-700 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+            <Input
+              placeholder="Filter by location..."
+              className="pl-10 text-gray-700 border-gray-300"
               value={value.location}
-              onChange={(e) =>
-                set("location", e.target.value as Filters["location"])
-              }
-            >
-              <option>All</option>
-              <option>Production Line A</option>
-              <option>Warehouse B</option>
-              <option>Workshop A</option>
-              <option>Utility Room</option>
-              <option>Packing Area</option>
-            </select>
+              onChange={(e) => set("location", e.target.value)}
+            />
           </div>
 
           <div className="relative">
